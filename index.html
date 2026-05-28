@@ -5,34 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>福瑞斯特中小學 - 點心訂餐系統</title>
     <style>
-        /* --- 寬螢幕與大字體優化版 --- */
         body { font-family: 'Microsoft JhengHei', sans-serif; background-color: #f0f2f5; padding: 20px; color: #333; margin: 0; }
-        
-        /* 寬度從 600px 增加到 800px，間距也加大 */
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 35px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
-        
         h2 { text-align: center; color: #1a73e8; margin-bottom: 8px; font-size: 28px; }
         .sub-title { text-align:center; font-weight:bold; font-size:24px; margin-bottom:20px; color: #333; }
         
+        /* 倒數計時與說明區 */
         .countdown-box { background: #ffebee; border: 2px solid #ef5350; color: #c62828; text-align: center; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-bottom: 25px; display: none; }
         .countdown-time { font-size: 24px; margin-top: 8px; display: block; }
-
         .desc { font-size: 18px; color: #5f6368; line-height: 1.6; margin-bottom: 30px; background: #fffbe6; padding: 20px; border-radius: 8px; border: 1px solid #ffe58f; }
         
+        /* 菜單圖片區塊 */
         .menu-section { text-align: center; margin-bottom: 35px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; }
         .menu-section h3 { margin-top: 0; font-size: 22px; color: #444; }
         .menu-img { max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: zoom-in; display: none; }
         .click-hint { font-size: 16px; color: #1a73e8; margin-top: 10px; display: block; font-weight: bold; }
 
+        /* 圖片放大模態框 */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); overflow: hidden; }
         .modal-content { margin: auto; display: block; max-width: 95%; max-height: 90vh; position: relative; top: 50%; transform: translateY(-50%); border-radius: 8px; }
         .close-btn { position: absolute; top: 20px; right: 30px; color: white; font-size: 50px; font-weight: bold; cursor: pointer; text-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 1001; }
         
+        /* --- 新增：班級與學生按鈕網格設計 --- */
+        .step-title { text-align: center; font-size: 22px; color: #d93025; font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        
+        /* 班級綠色按鈕 */
+        .btn-class { background-color: #557b46; color: white; border: none; padding: 20px 10px; font-size: 24px; font-weight: bold; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); transition: transform 0.1s, background-color 0.2s; }
+        .btn-class:hover { background-color: #436236; }
+        .btn-class:active { transform: scale(0.95); }
+
+        /* 學生白色按鈕 */
+        .btn-student { background-color: white; color: #333; border: 2px solid #e0e0e0; padding: 15px 10px; border-radius: 12px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: border-color 0.2s, background-color 0.2s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .btn-student:hover { border-color: #1a73e8; background-color: #f8faff; }
+        .btn-student .seat-num { font-size: 16px; color: #888; margin-bottom: 5px; }
+        .btn-student .student-name { font-size: 20px; font-weight: bold; color: #333; }
+
+        .back-btn { background-color: #f1f3f4; color: #333; border: 1px solid #ccc; padding: 10px 20px; font-size: 18px; border-radius: 8px; cursor: pointer; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 5px; font-weight: bold;}
+        .back-btn:hover { background-color: #e8eaed; }
+
+        /* 表單區塊 */
         .form-group { margin-bottom: 30px; }
         .form-group b { display: block; margin-bottom: 12px; font-size: 20px; }
         input[type="text"] { width: 100%; padding: 15px; font-size: 18px; border: 2px solid #dfe1e5; border-radius: 8px; box-sizing: border-box; }
-        input[type="text"]:focus { border-color: #1a73e8; outline: none; }
-
+        
         .info-box { background: #e8f0fe; padding: 25px; border-radius: 10px; margin-bottom: 30px; border-left: 6px solid #1a73e8; }
         .info-box span { display: block; font-size: 20px; margin-bottom: 10px; font-weight: bold; }
         .note-red { color: #d93025; font-size: 22px; }
@@ -41,9 +57,10 @@
         label { margin-right: 30px; font-size: 20px; cursor: pointer; display: inline-block; padding: 5px 0; }
         input[type="radio"] { transform: scale(1.5); margin-right: 10px; }
 
-        button { width: 100%; padding: 20px; font-size: 22px; font-weight: bold; background-color: #34a853; color: white; border: none; border-radius: 8px; cursor: pointer; }
-        button:hover { background-color: #2d8e47; }
-        button:disabled { background-color: #999; cursor: not-allowed; }
+        button.submit-btn { width: 100%; padding: 20px; font-size: 22px; font-weight: bold; background-color: #34a853; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        button.submit-btn:hover { background-color: #2d8e47; }
+        button.submit-btn:disabled { background-color: #999; cursor: not-allowed; }
+        
         .footer-note { text-align: center; font-size: 14px; color: #999; margin-top: 25px; }
     </style>
 </head>
@@ -74,40 +91,50 @@
         <span class="click-hint" id="click_hint_text" style="display:none;">👆 點擊圖片可放大查看</span>
     </div>
 
-    <div class="form-group">
-        <b>輸入班級座號：</b>
-        <input type="text" id="student_id" placeholder="例如：50101 (輸入後點擊空白處)" onblur="searchStudent()" disabled>
-    </div>
-
-    <div class="info-box">
-        <span id="display_name">學生姓名：(等待系統就緒...)</span>
-        <span id="display_note" class="note-red">系統飲食備註：(等待系統就緒...)</span>
-    </div>
-
-    <div class="form-group">
-        <b>(1) 是否訂購當月的點心？</b>
-        <div class="radio-group">
-            <label><input type="radio" name="order" value="是" onclick="toggleFoodType()" disabled> 是</label>
-            <label><input type="radio" name="order" value="否" onclick="toggleFoodType()" disabled> 否</label>
+    <div id="step1_class">
+        <div class="step-title">🎯 請選擇班級</div>
+        <div id="class_grid" class="grid-container">
+            <div style="text-align: center; width: 100%; grid-column: 1 / -1;">名單載入中，請稍候...</div>
         </div>
     </div>
 
-    <div class="form-group" id="food_type_section" style="display: none;">
-        <b>(2) 點心餐點：</b>
-        <div class="radio-group">
-            <label><input type="radio" name="type" value="葷" checked> 葷</label>
-            <label><input type="radio" name="type" value="素"> 素</label>
+    <div id="step2_student" style="display: none;">
+        <button class="back-btn" onclick="backToClasses()">🔙 回上一頁選班級</button>
+        <div class="step-title" style="color: #333;" id="student_grid_title"></div>
+        <div id="student_grid" class="grid-container"></div>
+    </div>
+
+    <div id="step3_form" style="display: none; margin-top: 20px; border-top: 2px dashed #ccc; padding-top: 30px;">
+        <div class="info-box">
+            <span id="display_name">學生姓名：</span>
+            <span id="display_note" class="note-red">系統飲食備註：</span>
         </div>
-    </div>
 
-    <div class="form-group">
-        <b>(3) 家長備註：</b>
-        <input type="text" id="parent_remark" placeholder="若有其他特別需求請填寫於此 (選填)" disabled>
-    </div>
+        <div class="form-group">
+            <b>(1) 是否訂購當月的點心？</b>
+            <div class="radio-group">
+                <label><input type="radio" name="order" value="是" onclick="toggleFoodType()"> 是</label>
+                <label><input type="radio" name="order" value="否" onclick="toggleFoodType()"> 否</label>
+            </div>
+        </div>
 
-    <button onclick="submitData()" id="submitBtn" disabled>資料載入中，請稍候...</button>
+        <div class="form-group" id="food_type_section" style="display: none;">
+            <b>(2) 點心餐點：</b>
+            <div class="radio-group">
+                <label><input type="radio" name="type" value="葷" checked> 葷</label>
+                <label><input type="radio" name="type" value="素"> 素</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <b>(3) 家長備註：</b>
+            <input type="text" id="parent_remark" placeholder="若有其他特別需求請填寫於此 (選填)">
+        </div>
+
+        <button onclick="submitData()" id="submitBtn" class="submit-btn">確認送出報名資料</button>
+    </div>
     
-    <div class="footer-note">製作人：TATA版本 (雲端連動版)</div>
+    <div class="footer-note">製作人：TATA版本 (按鈕點選升級版)</div>
 </div>
 
 <script>
@@ -115,8 +142,10 @@
     const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzANxRbt7gHmuZR7G2icmjz9pPBntH1A2Esg5Q8YNL-VBvwju5aF4hpEZ5q5ZTalhNE/exec";
     
     let studentData = {};
+    let classGroups = {}; // 存放分組後的班級資料
     let systemConfig = {};
     let countdownInterval;
+    let currentSelectedId = ""; // 紀錄目前選中的學生座號
 
     window.onload = function() {
         fetch(GOOGLE_API_URL + "?action=getInitialData")
@@ -125,35 +154,120 @@
                 studentData = data.students;
                 systemConfig = data.config;
                 
+                // 設定標題與圖片
                 document.getElementById('dynamic_title').innerText = systemConfig.monthName + "點心訂購單";
                 document.getElementById('menu_title').innerText = "📅 " + systemConfig.monthName + "點心菜單";
-                
                 const menuImg = document.getElementById('dynamic_menu_img');
                 menuImg.src = systemConfig.menuImage;
                 menuImg.style.display = "inline-block"; 
                 document.getElementById('click_hint_text').style.display = "block";
                 document.getElementById('zoomedImg').src = systemConfig.menuImage;
-
                 document.getElementById('deadline_text').innerText = systemConfig.deadline.replace('T', ' ');
                 document.getElementById('countdown_container').style.display = "block";
 
-                document.getElementById('student_id').disabled = false;
-                document.getElementById('parent_remark').disabled = false;
-                document.querySelectorAll('input[name="order"]').forEach(radio => radio.disabled = false);
-                document.getElementById('display_name').innerText = "學生姓名：(請輸入班級座號)";
-                document.getElementById('display_note').innerText = "系統飲食備註：(請輸入班級座號)";
+                // 自動將資料分組 (抓取座號末2碼，其餘為班級)
+                classGroups = {};
+                for (let id in studentData) {
+                    let className = id.substring(0, id.length - 2); // 例如 "101"
+                    let seatNum = id.substring(id.length - 2);      // 例如 "01"
+                    
+                    if (!classGroups[className]) {
+                        classGroups[className] = [];
+                    }
+                    classGroups[className].push({
+                        id: id,
+                        seat: seatNum,
+                        name: studentData[id].name,
+                        note: studentData[id].note
+                    });
+                }
 
+                // 產生班級按鈕
+                renderClassGrid();
+
+                // 啟動倒數計時
                 countdownInterval = setInterval(updateCountdown, 1000);
                 updateCountdown(); 
             })
             .catch(err => {
                 console.error(err);
-                alert("無法連線至 Google 試算表，請檢查設定");
+                document.getElementById('class_grid').innerHTML = "<div style='color:red; grid-column: 1/-1; text-align:center;'>資料載入失敗，請檢查 API 網址是否正確。</div>";
             });
     }
 
+    // --- 畫面切換邏輯 ---
+    function renderClassGrid() {
+        let html = "";
+        // 將班級排序 (101, 102...)
+        let sortedClasses = Object.keys(classGroups).sort();
+        
+        sortedClasses.forEach(className => {
+            html += `<button class="btn-class" onclick="showStudents('${className}')">${className}</button>`;
+        });
+        document.getElementById("class_grid").innerHTML = html;
+    }
+
+    function showStudents(className) {
+        document.getElementById("step1_class").style.display = "none";
+        document.getElementById("step2_student").style.display = "block";
+        document.getElementById("step3_form").style.display = "none"; // 隱藏表單直到選定學生
+        
+        document.getElementById("student_grid_title").innerHTML = `🧑‍🤝‍🧑 【${className}】學生名單`;
+        
+        let html = "";
+        // 依照座號排序
+        let students = classGroups[className].sort((a, b) => parseInt(a.seat) - parseInt(b.seat));
+        
+        students.forEach(student => {
+            html += `
+                <button class="btn-student" onclick="selectStudent('${student.id}')">
+                    <span class="seat-num">${student.seat} 號</span>
+                    <span class="student-name">${student.name}</span>
+                </button>
+            `;
+        });
+        document.getElementById("student_grid").innerHTML = html;
+    }
+
+    function backToClasses() {
+        document.getElementById("step1_class").style.display = "block";
+        document.getElementById("step2_student").style.display = "none";
+        document.getElementById("step3_form").style.display = "none";
+        currentSelectedId = "";
+    }
+
+    function selectStudent(id) {
+        currentSelectedId = id;
+        const student = studentData[id];
+        
+        // 帶入資料
+        document.getElementById('display_name').innerText = `學生姓名：${student.name}`;
+        document.getElementById('display_note').innerText = `系統飲食備註：${student.note}`;
+        
+        // 清空之前的選項
+        document.querySelectorAll('input[name="order"]').forEach(r => r.checked = false);
+        document.getElementById('food_type_section').style.display = 'none';
+        document.getElementById('parent_remark').value = "";
+
+        // 顯示表單並平滑捲動到表單位置
+        const formSection = document.getElementById("step3_form");
+        formSection.style.display = "block";
+        formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // --- 圖片與雜項功能 ---
     function openModal() { document.getElementById('imageModal').style.display = "block"; }
     function closeModal() { document.getElementById('imageModal').style.display = "none"; }
+    
+    function toggleFoodType() {
+        const orderChecked = document.querySelector('input[name="order"]:checked');
+        const foodTypeSection = document.getElementById('food_type_section');
+        if (orderChecked && orderChecked.value === '是') {
+            foodTypeSection.style.display = 'block';
+        } else {
+            foodTypeSection.style.display = 'none';
+        }
+    }
 
     function updateCountdown() {
         const dest = new Date(systemConfig.deadline).getTime();
@@ -172,9 +286,6 @@
             btn.disabled = true;
             btn.innerText = "報名時間已截止";
             btn.style.backgroundColor = "#999";
-            
-            document.getElementById('student_id').disabled = true;
-            document.querySelectorAll('input[name="order"]').forEach(r => r.disabled = true);
             clearInterval(countdownInterval); 
             return;
         }
@@ -185,41 +296,16 @@
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
         countdownTimer.innerHTML = `倒數：${days} 天 ${hours} 小時 ${minutes} 分 ${seconds} 秒`;
-        
-        btn.disabled = false;
-        btn.innerText = "確認送出報名資料";
-    }
-
-    function searchStudent() {
-        const id = document.getElementById('student_id').value.trim();
-        const nameEl = document.getElementById('display_name');
-        const noteEl = document.getElementById('display_note');
-
-        if (studentData[id]) {
-            nameEl.innerText = "學生姓名：" + studentData[id].name;
-            noteEl.innerText = "系統飲食備註：" + studentData[id].note;
-        } else if (id !== "") {
-            nameEl.innerText = "學生姓名：(查無此座號)";
-            noteEl.innerText = "系統飲食備註：(請檢查輸入是否正確)";
-        }
-    }
-
-    function toggleFoodType() {
-        const orderChecked = document.querySelector('input[name="order"]:checked');
-        const foodTypeSection = document.getElementById('food_type_section');
-        if (orderChecked && orderChecked.value === '是') {
-            foodTypeSection.style.display = 'block';
-        } else {
-            foodTypeSection.style.display = 'none';
-        }
     }
 
     function submitData() {
-        const id = document.getElementById('student_id').value.trim();
-        if (!studentData[id]) { alert("請先輸入正確的班級座號！"); return; }
+        if (!currentSelectedId) { 
+            alert("系統錯誤：請重新選擇學生！"); 
+            return; 
+        }
 
         const orderChecked = document.querySelector('input[name="order"]:checked');
-        if (!orderChecked) { alert("請勾選「是否訂購當月點心」"); return; }
+        if (!orderChecked) { alert("請勾選「(1) 是否訂購當月的點心？」"); return; }
 
         const order = orderChecked.value;
         let type = "無";
@@ -227,15 +313,15 @@
             type = document.querySelector('input[name="type"]:checked').value;
         }
         
-        const name = studentData[id].name;
-        const note = studentData[id].note;
+        const name = studentData[currentSelectedId].name;
+        const note = studentData[currentSelectedId].note;
         const remark = document.getElementById('parent_remark').value.trim();
         const btn = document.getElementById('submitBtn');
 
         btn.innerText = "正在上傳資料...";
         btn.disabled = true;
 
-        const url = `${GOOGLE_API_URL}?action=addOrder&id=${id}&name=${encodeURIComponent(name)}&order=${encodeURIComponent(order)}&type=${encodeURIComponent(type)}&note=${encodeURIComponent(note)}&remark=${encodeURIComponent(remark)}`;
+        const url = `${GOOGLE_API_URL}?action=addOrder&id=${currentSelectedId}&name=${encodeURIComponent(name)}&order=${encodeURIComponent(order)}&type=${encodeURIComponent(type)}&note=${encodeURIComponent(note)}&remark=${encodeURIComponent(remark)}`;
 
         fetch(url)
             .then(res => res.text())
