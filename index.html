@@ -26,7 +26,7 @@
         .modal-content { margin: auto; display: block; max-width: 95%; max-height: 90vh; position: relative; top: 50%; transform: translateY(-50%); border-radius: 8px; }
         .close-btn { position: absolute; top: 20px; right: 30px; color: white; font-size: 50px; font-weight: bold; cursor: pointer; text-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 1001; }
         
-        /* --- 新增：班級與學生按鈕網格設計 --- */
+        /* 班級與學生按鈕網格設計 */
         .step-title { text-align: center; font-size: 22px; color: #d93025; font-weight: bold; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; margin-bottom: 30px; }
         
@@ -91,6 +91,7 @@
         <span class="click-hint" id="click_hint_text" style="display:none;">👆 點擊圖片可放大查看</span>
     </div>
 
+    <!-- Step 1: 選擇班級 -->
     <div id="step1_class">
         <div class="step-title">🎯 請選擇班級</div>
         <div id="class_grid" class="grid-container">
@@ -98,12 +99,27 @@
         </div>
     </div>
 
+    <!-- Step 2: 選擇學生 -->
     <div id="step2_student" style="display: none;">
         <button class="back-btn" onclick="backToClasses()">🔙 回上一頁選班級</button>
         <div class="step-title" style="color: #333;" id="student_grid_title"></div>
         <div id="student_grid" class="grid-container"></div>
     </div>
 
+    <!-- 🌟 Step 2.5 密碼驗證區塊 -->
+    <div id="step25_verify" style="display: none; padding-top: 20px;">
+        <button class="back-btn" onclick="backToStudents()">🔙 回上一頁選學生</button>
+        <div class="step-title" style="color: #557b46; font-size: 26px;">🌱 專屬密碼驗證</div>
+        <div style="text-align: center; margin-bottom: 30px; background: #fdfbf7; padding: 30px; border-radius: 15px; border: 2px dashed #a3b899;">
+            <p id="verify_student_name" style="font-size: 24px; font-weight: bold; color: #333; margin-bottom: 20px;"></p>
+            <input type="password" id="password_input" placeholder="請輸入專屬密碼" 
+                   style="width: 250px; text-align: center; font-size: 22px; padding: 15px; border-radius: 12px; border: 2px solid #557b46; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;">
+            <br>
+            <button class="btn-class" style="width: 250px; font-size: 22px; border-radius: 30px;" onclick="verifyPassword()">🐾 確認並前往報名</button>
+        </div>
+    </div>
+
+    <!-- Step 3: 報名表單 -->
     <div id="step3_form" style="display: none; margin-top: 20px; border-top: 2px dashed #ccc; padding-top: 30px;">
         <div class="info-box">
             <span id="display_name">學生姓名：</span>
@@ -138,14 +154,14 @@
 </div>
 
 <script>
-    // ⚠️ 請填入你的 Apps Script 網址 ⚠️
+    // ⚠️⚠️ 請填入你的 Apps Script 網址 ⚠️⚠️
     const GOOGLE_API_URL = "https://script.google.com/macros/s/AKfycbzANxRbt7gHmuZR7G2icmjz9pPBntH1A2Esg5Q8YNL-VBvwju5aF4hpEZ5q5ZTalhNE/exec";
     
     let studentData = {};
-    let classGroups = {}; // 存放分組後的班級資料
+    let classGroups = {}; 
     let systemConfig = {};
     let countdownInterval;
-    let currentSelectedId = ""; // 紀錄目前選中的學生座號
+    let currentSelectedId = ""; 
 
     window.onload = function() {
         fetch(GOOGLE_API_URL + "?action=getInitialData")
@@ -168,8 +184,8 @@
                 // 自動將資料分組 (抓取座號末2碼，其餘為班級)
                 classGroups = {};
                 for (let id in studentData) {
-                    let className = id.substring(0, id.length - 2); // 例如 "101"
-                    let seatNum = id.substring(id.length - 2);      // 例如 "01"
+                    let className = id.substring(0, id.length - 2); 
+                    let seatNum = id.substring(id.length - 2);      
                     
                     if (!classGroups[className]) {
                         classGroups[className] = [];
@@ -198,7 +214,6 @@
     // --- 畫面切換邏輯 ---
     function renderClassGrid() {
         let html = "";
-        // 將班級排序 (101, 102...)
         let sortedClasses = Object.keys(classGroups).sort();
         
         sortedClasses.forEach(className => {
@@ -210,12 +225,12 @@
     function showStudents(className) {
         document.getElementById("step1_class").style.display = "none";
         document.getElementById("step2_student").style.display = "block";
-        document.getElementById("step3_form").style.display = "none"; // 隱藏表單直到選定學生
+        document.getElementById("step25_verify").style.display = "none";
+        document.getElementById("step3_form").style.display = "none";
         
         document.getElementById("student_grid_title").innerHTML = `🧑‍🤝‍🧑 【${className}】學生名單`;
         
         let html = "";
-        // 依照座號排序
         let students = classGroups[className].sort((a, b) => parseInt(a.seat) - parseInt(b.seat));
         
         students.forEach(student => {
@@ -232,27 +247,65 @@
     function backToClasses() {
         document.getElementById("step1_class").style.display = "block";
         document.getElementById("step2_student").style.display = "none";
+        document.getElementById("step25_verify").style.display = "none";
         document.getElementById("step3_form").style.display = "none";
         currentSelectedId = "";
     }
 
+    // 🌟 選擇學生後，進入密碼驗證畫面
     function selectStudent(id) {
         currentSelectedId = id;
         const student = studentData[id];
         
-        // 帶入資料
-        document.getElementById('display_name').innerText = `學生姓名：${student.name}`;
-        document.getElementById('display_note').innerText = `系統飲食備註：${student.note}`;
+        // 隱藏學生名單，顯示密碼驗證區塊
+        document.getElementById("step2_student").style.display = "none";
+        document.getElementById("step25_verify").style.display = "block";
+        document.getElementById("step3_form").style.display = "none";
         
-        // 清空之前的選項
-        document.querySelectorAll('input[name="order"]').forEach(r => r.checked = false);
-        document.getElementById('food_type_section').style.display = 'none';
-        document.getElementById('parent_remark').value = "";
+        // 顯示可愛的提示語
+        document.getElementById("verify_student_name").innerText = `請輸入【${student.name}】的專屬密碼 🌰`;
+        
+        // 清空輸入框並自動對焦
+        document.getElementById("password_input").value = "";
+        document.getElementById("password_input").focus();
+    }
 
-        // 顯示表單並平滑捲動到表單位置
-        const formSection = document.getElementById("step3_form");
-        formSection.style.display = "block";
-        formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // 🌟 退回學生名單功能
+    function backToStudents() {
+        document.getElementById("step25_verify").style.display = "none";
+        document.getElementById("step2_student").style.display = "block";
+    }
+
+    // 🌟 驗證密碼邏輯
+    function verifyPassword() {
+        const inputVal = document.getElementById("password_input").value.trim();
+        const correctPassword = studentData[currentSelectedId].password;
+
+        if (inputVal === correctPassword) {
+            // 密碼正確！隱藏驗證區塊，顯示最終報名表單
+            document.getElementById("step25_verify").style.display = "none";
+            
+            const student = studentData[currentSelectedId];
+            
+            // 帶入資料
+            document.getElementById('display_name').innerText = `學生姓名：${student.name}`;
+            document.getElementById('display_note').innerText = `系統飲食備註：${student.note}`;
+            
+            // 清空之前的表單選項
+            document.querySelectorAll('input[name="order"]').forEach(r => r.checked = false);
+            document.getElementById('food_type_section').style.display = 'none';
+            document.getElementById('parent_remark').value = "";
+
+            // 顯示表單並平滑捲動到表單位置
+            const formSection = document.getElementById("step3_form");
+            formSection.style.display = "block";
+            formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            // 密碼錯誤提示
+            alert("❌ 密碼輸入錯誤，請再試一次喔！");
+            document.getElementById("password_input").value = "";
+            document.getElementById("password_input").focus();
+        }
     }
 
     // --- 圖片與雜項功能 ---
